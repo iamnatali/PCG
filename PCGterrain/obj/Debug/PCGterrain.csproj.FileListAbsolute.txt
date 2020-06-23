@@ -1,0 +1,14 @@
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\bin\Debug\PCGterrain.exe.config
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\bin\Debug\PCGterrain.exe
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\bin\Debug\PCGterrain.pdb
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\bin\Debug\System.Drawing.Common.dll
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\obj\Debug\PCGterrain.csprojAssemblyReference.cache
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\obj\Debug\PCGterrain.csproj.CoreCompileInputs.cache
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\obj\Debug\PCGterrain.csproj.CopyComplete
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\obj\Debug\PCGterrain.exe
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\obj\Debug\PCGterrain.pdb
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\bin\Debug\Castle.Core.dll
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\bin\Debug\Ninject.dll
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\bin\Debug\Ninject.Extensions.Factory.dll
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\bin\Debug\Ninject.xml
+C:\Users\pervu\source\repos\PCGterrain\PCGterrain\bin\Debug\Ninject.Extensions.Factory.xml
