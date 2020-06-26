@@ -38,6 +38,8 @@ namespace PCG
 
         public static bool DimensionIsOK(int dimension, int delta)
         {
+            if (delta == 0)
+                throw new ArgumentException("delta should be > 1");
             return (dimension - 1) % (delta - 1) == 0;
         }
 
