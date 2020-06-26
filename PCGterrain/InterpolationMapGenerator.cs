@@ -10,9 +10,9 @@ namespace PCG
 {
     public abstract class InterpolationMapGenerator : HeightMapGenerator
     {
-        public int delta;
-        public int lowerBound;
-        public int upperBound;
+        public int delta { get; set; }
+        public int lowerBound { get; set; }
+        public int upperBound { get; set; }
 
         public InterpolationMapGenerator() { }
 

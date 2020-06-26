@@ -12,7 +12,7 @@ namespace PCG
     {
         private  int size;
         private  double[][] map;
-        public  int roughness;
+        public  int roughness { get; set; }
         private  static Random random = new Random();
 
         public DiamondSquareGenerator() { }
@@ -84,12 +84,11 @@ namespace PCG
 
         public double[][] GetMap(int width = 1025, int height=1025)
         {
-            //проверить на степень двойки
             if (width != height)
-                throw new ArgumentException("Width should be equal height");
+                throw new ArgumentException("Width should be equal to height");
             var powerCheck = width - 1;
             if ((powerCheck & (powerCheck - 1)) != 0)
-                throw new ArgumentException("Width and height should be powers of two +1");
+                throw new ArgumentException("Width and height should be (power of two)+1");
             Fill(width);
             return map;
         }

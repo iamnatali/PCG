@@ -71,6 +71,17 @@ namespace PCG
             SaveHeightMap(heightMap, width, height, path);
         }
 
+        public static void ResultHeightMapPic(double[][] heightMap, int width,
+            int height, bool dolinize, string path)
+        {
+            MakeMapPositive(heightMap);
+            if (dolinize)
+                Dolinize(heightMap);
+            else
+                NormalizeMap(heightMap);
+            SaveHeightMap(heightMap, width, height, path);
+        }
+
         [STAThread]
         static void Main(string[] args)
         {
@@ -81,6 +92,8 @@ namespace PCG
             form.Size = new Size(600, 600);
             form.StartPosition = FormStartPosition.CenterScreen;
             Application.Run(form);
+            //var mg = new PerlinGradientInterpolationGenerator(33, 100, 0);
+            //GenerateHeightMapPic(mg, 1025, 1025, false, "");
         }
     }
 }

@@ -11,9 +11,9 @@ namespace PCG
         private int mapSizeX;
         private int mapSizeY;
         private double[][] map;
-        public  int maxRadius;
-        public  int minRadius;
-        public  int stepsCount;
+        public int maxRadius { get; set; }
+        public  int minRadius { get; set; }
+        public  int stepsCount { get; set; }
 
         public HillGenerator() { }
 

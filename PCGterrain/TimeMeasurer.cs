@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PCGterrain
 {
-    class TimeMeasurer
+    public class TimeMeasurer
     {
         public StatValue sv;
         public void RunNTimes(Func<double[][]> action, int n)

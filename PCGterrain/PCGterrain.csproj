@@ -67,6 +67,7 @@
     <Compile Include="HillGenerator.cs" />
     <Compile Include="InterpolationMapGenerator.cs" />
     <Compile Include="DiamondSquareGenerator.cs" />
+    <Compile Include="MapAdder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StatValue.cs" />

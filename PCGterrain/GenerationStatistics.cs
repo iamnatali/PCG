@@ -10,6 +10,13 @@ namespace PCGterrain
 {
     public class GenerationStatistics
     {
+        public TimeMeasurer TimeMeasurer { get; private set; }
+
+        public GenerationStatistics()
+        {
+            TimeMeasurer = new TimeMeasurer();
+        }
+
         List<HeightMapGenerator> testList = new List<HeightMapGenerator>()
         {
             new BilinearValueInterpolationGenerator(33, 200, 0),
@@ -22,11 +29,10 @@ namespace PCGterrain
 
         public string GetStatistics(HeightMapGenerator inter, int n, int width, int height)
         {
-            var tm = new TimeMeasurer();
-            tm.RunNTimes(() => inter.GetMap(width, height), n);
+            TimeMeasurer.RunNTimes(() => inter.GetMap(width, height), n);
             Console.WriteLine(inter.GetType().Name);
-            Console.WriteLine(tm.sv.ToDetailedString());
-            return tm.sv.ToDetailedString();
+            Console.WriteLine(TimeMeasurer.sv.ToDetailedString());
+            return TimeMeasurer.sv.ToDetailedString();
         }
     }
 }

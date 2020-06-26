@@ -33,6 +33,7 @@ namespace PCGterrain
 	{
 		static StandardKernel container;
 		private static Dictionary<string, List<string>> generatorsNamesParameters;
+		private static MapAdder mapAdder = null;
 
 		static MenuForm()
 		{
@@ -69,18 +70,13 @@ namespace PCGterrain
 				
 				.ToDictionary(t=>t.Name,t=> {
 					var parameters =
-					t.GetFields()
+					t.GetProperties()
+					.Where(p=>!p.IsPrivate())
 					.Select(p=>p.Name)
 					.ToList();
 					return parameters;
 				});
 			generatorsNamesParameters = d;
-			foreach (var p in d)
-			{
-				Console.WriteLine(p.Key.ToString());
-				foreach (var v in p.Value)
-					Console.WriteLine(v);
-			}
 				
 		}
 
@@ -89,11 +85,11 @@ namespace PCGterrain
 			label.Text = listBox.SelectedItem.ToString();
 			var choise = label.Text;
 			var parameters = generatorsNamesParameters[choise];
-			var startLocation = new Point(50, listBox.Bottom + 10);
+			var startLocation = new Point(50, label.Bottom + 10);
 			var numericList = new List<NumericUpDown>();
 			var labelList = new List<Label>();
 			foreach (string p in (new List<string>() { "width", "height", 
-				"times to run to get statistics" })
+				"times to run to get statistics", "coeff"})
 			.Concat(parameters))
 			{
 				var lab = new Label
@@ -122,12 +118,11 @@ namespace PCGterrain
 			var button = new Button
 			{
 				Location = startLocation,
-				Size = new Size(500, 50),
+				Size = new Size(250, 50),
 				Font = new Font("Times New Roman", 14, FontStyle.Regular),
 				Text = "GENERATE",
 				BackColor = Color.LavenderBlush
 			};
-			
 			button.Click += (sender1, args1) =>
 			{
 				var fbd = new FolderBrowserDialog();
@@ -136,12 +131,28 @@ namespace PCGterrain
 				fbd.ShowNewFolderButton = false;
 				if (fbd.ShowDialog() == DialogResult.OK)
 				{
-					Console.WriteLine(fbd.SelectedPath);
 					OnClick(labelList, numericList, 
 						choise, fbd.SelectedPath);
 				}
 			};
+			var buttonAdd = new Button
+			{
+				Location = new Point(startLocation.X+260, startLocation.Y),
+				Size = new Size(250, 50),
+				Font = new Font("Times New Roman", 14, FontStyle.Regular),
+				Text = "ADD",
+				BackColor = Color.LavenderBlush
+			};
+			buttonAdd.Click += (senderAdd, argsAdd) =>
+			{
+				OnAdd(labelList, numericList,
+						choise);
+				Controls.Clear();
+				InitWindow();
+			};
 			Controls.Add(button);
+			Controls.Add(buttonAdd);
+			Controls.Remove(listBox);
 		}
 
 		public void GetOnlyLabel(string text)
@@ -158,11 +169,11 @@ namespace PCGterrain
 			Controls.Add(lab);
 		}
 
-		public void OnClick(List<Label> labelList, List<NumericUpDown> numericList,
-			string choise, string path)
+		public void OnAdd(List<Label> labelList, List<NumericUpDown> numericList,
+			string choise)
 		{
-			var labesText = labelList.Skip(3).Select(lab1 => lab1.Text);
-			var list = numericList.Skip(3).Select(el => (int)el.Value).ToList();
+			var labesText = labelList.Skip(4).Select(lab1 => lab1.Text);
+			var list = numericList.Skip(4).Select(el => (int)el.Value).ToList();
 			var resD = labesText.Zip(list, (w1, w2) => (w1, w2))
 			.ToDictionary(p => p.w1, p => p.w2);
 			var names = generatorsNamesParameters[choise];
@@ -172,19 +183,19 @@ namespace PCGterrain
 				var width = (int)(numericList[0].Value);
 				var height = (int)numericList[1].Value;
 				var n = (int)numericList[2].Value;
+				var coeff = (int)numericList[3].Value;
 				var name = choise;
 				var gen = f.CreateGenerator(name);
 				var prop = gen
 				.GetType()
-				.GetFields()
+				.GetProperties()
+				.Where(p => !p.IsPrivate())
 				.Where(fld => names.Contains(fld.Name));
 				foreach (var pr in prop)
 					pr.SetValue(gen, resD[pr.Name]);
-				Program.GenerateHeightMapPic(gen, width, height, false, path);
-				var gs = new GenerationStatistics();
-				var res = gs.GetStatistics(gen, n, width, height);
-				GetOnlyLabel("STATISTICS\n" + res);
-				//this.Close();
+				if (mapAdder == null)
+					mapAdder = new MapAdder(width, height);
+				mapAdder.Add(gen.GetMap(width, height),coeff, gen, n);
 			}
 			catch (ArgumentException e)
 			{
@@ -192,7 +203,53 @@ namespace PCGterrain
 			}
 		}
 
-		public MenuForm()
+		public void OnClick(List<Label> labelList, List<NumericUpDown> numericList,
+			string choise, string path)
+		{
+			var labesText = labelList.Skip(4).Select(lab1 => lab1.Text);
+			var list = numericList.Skip(4).Select(el => (int)el.Value).ToList();
+			var resD = labesText.Zip(list, (w1, w2) => (w1, w2))
+			.ToDictionary(p => p.w1, p => p.w2);
+			var names = generatorsNamesParameters[choise];
+			var f = container.Get<IGeneratorFactory>();
+			try
+			{
+				var width = (int)(numericList[0].Value);
+				var height = (int)numericList[1].Value;
+				var n = (int)numericList[2].Value;
+				var coeff = (int)numericList[3].Value;
+				var name = choise;
+				var gen = f.CreateGenerator(name);
+				var prop = gen
+				.GetType()
+				.GetProperties()
+				.Where(p => !p.IsPrivate())
+				.Where(fld => names.Contains(fld.Name));
+				foreach (var pr in prop)
+					pr.SetValue(gen, resD[pr.Name]);
+				string res;
+				if (mapAdder == null)
+				{
+					Program.GenerateHeightMapPic(gen, width, height, false, path);
+					var gs = new GenerationStatistics();
+					res = gs.GetStatistics(gen, n, width, height);
+				}
+				else
+				{
+					mapAdder.Add(gen.GetMap(width, height), coeff, gen, n);
+					Program.ResultHeightMapPic(mapAdder.Map, width, height, false, path);
+					res = mapAdder.generationStatistics.TimeMeasurer.sv.ToDetailedString();
+					Console.WriteLine(res);
+				}
+				GetOnlyLabel("STATISTICS\n" + res);
+			}
+			catch (ArgumentException e)
+			{
+				GetOnlyLabel("ERROR\n" + e.Message.ToString());
+			}
+		}
+
+		public void InitWindow()
 		{
 			var label = new Label
 			{
@@ -206,7 +263,7 @@ namespace PCGterrain
 			};
 			var listBox = new ListBox
 			{
-				Location = new Point(50, label.Bottom+20),
+				Location = new Point(50, label.Bottom + 20),
 				Size = new Size(500, 80),
 				Font = new Font("Times New Roman", 14, FontStyle.Regular)
 			};
@@ -217,6 +274,11 @@ namespace PCGterrain
 			};
 			Controls.Add(label);
 			Controls.Add(listBox);
+		}
+
+		public MenuForm()
+		{
+			InitWindow();
 		}		
 	}
 }

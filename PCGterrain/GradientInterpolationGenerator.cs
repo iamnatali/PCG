@@ -30,6 +30,20 @@ namespace PCG
 
         public abstract double[][] Interpolate((double, double)[][] toFill);
 
+        private static double Fade(int xLength, int yLength, int x, int y,
+            double z1, double z2, double z3, double z4)
+        {
+            Func<double, double> d = t => 3 * t * t - 2 * t * t * t;
+            var sizeX = xLength;
+            var sizeY = yLength;
+            z1 = d(1 - (double)x / sizeX) * d(1 - (double)y / sizeY) * z1;
+            z2 = d((double)x / sizeX) * d(1 - (double)y / sizeY) * z2;
+            z3 = d(1 - (double)x / sizeX) * d((double)y / sizeY) * z3;
+            z4 = d((double)x / sizeX) * d((double)y / sizeY) * z4;
+            var z = z1 + z2 + z3 + z4;
+            return z;
+        }
+
         public static double[][] BasicInterpolate((double, double)[][] gradient,
             Func<double, double> s)
         {
@@ -49,10 +63,12 @@ namespace PCG
                 arrayToFill[x] = new double[yLength];
                 foreach (var y in yRange)
                 {
+                    var x1 = (x - (xLength - 1));
+                    var y1 = (y - (yLength - 1));
                     var z1 = x * g1.Item1 + y * g1.Item2;
-                    var z2 = (x - (xLength - 1)) * g2.Item1 + y * g2.Item2;
-                    var z3 = x * g3.Item1 + (y - (yLength - 1)) * g3.Item2;
-                    var z4 = (x - (xLength - 1)) * g4.Item1 + (y - (yLength - 1)) * g4.Item2;
+                    var z2 = x1 * g2.Item1 + y * g2.Item2;
+                    var z3 = x * g3.Item1 +  y1* g3.Item2;
+                    var z4 = x1 * g4.Item1 + y1 * g4.Item2;
                     var fz1 = InterpolationStep_GetZ(z1, z2, 0, xLength, x, s);
                     var fz2 = InterpolationStep_GetZ(z3, z4, 0, xLength, x, s);
                     var z = InterpolationStep_GetZ(fz1, fz2, 0, yLength, y, s);
@@ -89,7 +105,6 @@ namespace PCG
                     res[cur + i] = yLineDown[i];
                 cur += delta - 1;
             }
-            //PrintArray(res);
             return res;
         }
 
@@ -100,8 +115,7 @@ namespace PCG
             var randomArray = new (double, double)[width, height];
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
-                    randomArray[x, y] = (rnd.Next(lBound, uBound),
-                        rnd.Next(lBound, uBound));
+                    randomArray[x, y] = (rnd.Next(lBound, uBound), rnd.Next(lBound, uBound));
             return randomArray;
         }
 
