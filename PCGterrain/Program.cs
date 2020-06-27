@@ -19,7 +19,6 @@ namespace PCG
 {
     class Program
     {
-        //рефакторинг-все в одну функцию
         public static void NormalizeMap(double[][] map)
         {
             var max = map.Max(line => line.Max());
@@ -85,15 +84,15 @@ namespace PCG
         [STAThread]
         static void Main(string[] args)
         {
-            //var gen = new GenerationStatistics();
-            //gen.GetStatistics();
             var form = new MenuForm();
             form.BackColor = Color.Lavender;
-            form.Size = new Size(600, 600);
+            form.Width = 600;
+            form.AutoScaleMode = AutoScaleMode.Dpi;
+            form.AutoScroll = true;
+            form.Height = Screen.PrimaryScreen.WorkingArea.Height;
             form.StartPosition = FormStartPosition.CenterScreen;
+            form.FormBorderStyle = FormBorderStyle.FixedSingle;
             Application.Run(form);
-            //var mg = new PerlinGradientInterpolationGenerator(33, 100, 0);
-            //GenerateHeightMapPic(mg, 1025, 1025, false, "");
         }
     }
 }

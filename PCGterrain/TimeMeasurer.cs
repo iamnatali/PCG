@@ -11,9 +11,12 @@ namespace PCGterrain
     public class TimeMeasurer
     {
         public StatValue sv;
-        public void RunNTimes(Func<double[][]> action, int n)
+        public TimeMeasurer()
         {
             sv = new StatValue();
+        }
+        public void RunNTimes(Action action, int n)
+        {
             action();
             for (int i=0; i<n; i++)
             {
@@ -21,11 +24,11 @@ namespace PCGterrain
             }
         }
 
-        public double RunAndTime(Func<double[][]> action)
+        public double RunAndTime(Action action)
         {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-            var m = action();
+            action();
             stopWatch.Stop();
             var elapsed = stopWatch.ElapsedMilliseconds;
             sv.Add(elapsed);

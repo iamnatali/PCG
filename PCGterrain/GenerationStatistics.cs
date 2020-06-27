@@ -17,19 +17,11 @@ namespace PCGterrain
             TimeMeasurer = new TimeMeasurer();
         }
 
-        List<HeightMapGenerator> testList = new List<HeightMapGenerator>()
-        {
-            new BilinearValueInterpolationGenerator(33, 200, 0),
-            new NonlinearValueInterpolationGenerator(33, 200, 0),
-            new CosineValueInterpolationGenerator(33,200,0),
-            new HillGenerator(20,200, 1800),
-            new PerlinGradientInterpolationGenerator(33, 200, 0),
-            new DiamondSquareGenerator(200)
-        };
-
         public string GetStatistics(HeightMapGenerator inter, int n, int width, int height)
         {
-            TimeMeasurer.RunNTimes(() => inter.GetMap(width, height), n);
+            TimeMeasurer.RunNTimes(() => {
+                var w = inter.GetMap(width, height);
+                }, n);
             Console.WriteLine(inter.GetType().Name);
             Console.WriteLine(TimeMeasurer.sv.ToDetailedString());
             return TimeMeasurer.sv.ToDetailedString();

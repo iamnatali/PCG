@@ -34,9 +34,41 @@ namespace PCGterrain
 		static StandardKernel container;
 		private static Dictionary<string, List<string>> generatorsNamesParameters;
 		private static MapAdder mapAdder = null;
+		private static Font font= new Font("Times New Roman", 14, FontStyle.Regular);
+
+		private Font GetFont(Label label, string text,
+			int margin, float min_size, float max_size)
+		{
+			if (text.Length == 0) return new Font("Times New Roman", min_size, FontStyle.Regular);
+
+			int wid = label.DisplayRectangle.Width - margin;
+			int hgt = label.DisplayRectangle.Height - margin;
+
+			using (Graphics gr = label.CreateGraphics())
+			{
+				while (max_size - min_size > 0.1f)
+				{
+					//label.Font.FontFamily
+					float pt = (min_size + max_size) / 2f;
+					using (Font test_font =
+						new Font("Times New Roman", pt, FontStyle.Regular))
+					{
+						SizeF text_size =
+							gr.MeasureString(text, test_font);
+						if ((text_size.Width > wid) ||
+							(text_size.Height > hgt))
+							max_size = pt;
+						else
+							min_size = pt;
+					}
+				}
+				return new Font("Times New Roman", min_size, FontStyle.Regular); ;
+			}
+		}
 
 		static MenuForm()
 		{
+			
 			var contein = new StandardKernel();
 			contein.Bind<HeightMapGenerator>()
 			.To<BilinearValueInterpolationGenerator>()
@@ -60,14 +92,10 @@ namespace PCGterrain
 				.ToFactory(() => new UseFirstArgumentAsNameInstanceProvider());
 			container = contein;
 			Type ourtype = typeof(HeightMapGenerator);
-			var
-				dictionary1 = Assembly
+			var d = Assembly
 				.GetAssembly(ourtype)
 				.GetTypes()
 				.Where(type => ourtype.IsAssignableFrom(type) && !type.IsAbstract)
-				;
-			var d= dictionary1
-				
 				.ToDictionary(t=>t.Name,t=> {
 					var parameters =
 					t.GetProperties()
@@ -97,15 +125,15 @@ namespace PCGterrain
 					Location = startLocation,
 					Size = new Size(400, 20),
 					Text = p,
-					Font = new Font("Times New Roman", 14, FontStyle.Regular)
 				};
+				lab.Font = GetFont(lab, p, 1, 10, 18);
 				labelList.Add(lab);
 				startLocation = new Point(50, startLocation.Y + 25);
 				var el = new NumericUpDown
 				{
 					Location = startLocation,
 					Size = new Size(100, 40),
-					Font = new Font("Times New Roman", 14, FontStyle.Regular),
+					Font = font,
 					Maximum = 100000,
 					Minimum = 1
 					
@@ -119,7 +147,7 @@ namespace PCGterrain
 			{
 				Location = startLocation,
 				Size = new Size(250, 50),
-				Font = new Font("Times New Roman", 14, FontStyle.Regular),
+				Font = font,
 				Text = "GENERATE",
 				BackColor = Color.LavenderBlush
 			};
@@ -127,7 +155,7 @@ namespace PCGterrain
 			{
 				var fbd = new FolderBrowserDialog();
 				fbd.Description =
-				"Select the directory where you wanr to save picture";
+				"Select the directory where you want to save picture";
 				fbd.ShowNewFolderButton = false;
 				if (fbd.ShowDialog() == DialogResult.OK)
 				{
@@ -139,7 +167,7 @@ namespace PCGterrain
 			{
 				Location = new Point(startLocation.X+260, startLocation.Y),
 				Size = new Size(250, 50),
-				Font = new Font("Times New Roman", 14, FontStyle.Regular),
+				Font = font,
 				Text = "ADD",
 				BackColor = Color.LavenderBlush
 			};
@@ -163,8 +191,8 @@ namespace PCGterrain
 				Size = new Size(ClientSize.Width, ClientSize.Height),
 				Text = text,
 				TextAlign = ContentAlignment.MiddleCenter,
-				Font = new Font("Times New Roman", 24, FontStyle.Regular)
 			};
+			lab.Font = GetFont(lab, text, 1, 10, 18);
 			Controls.Clear();
 			Controls.Add(lab);
 		}
@@ -257,15 +285,16 @@ namespace PCGterrain
 				Size = new Size(500, 30),
 				TextAlign = ContentAlignment.MiddleCenter,
 				Text = "Choose type of generation",
-				Font = new Font("Times New Roman", 14, FontStyle.Regular),
+				//Font = font,
 				BackColor = Color.LavenderBlush,
 				BorderStyle = BorderStyle.FixedSingle
 			};
+			label.Font = GetFont(label, "Choose type of generation", 1, 10, 18);
 			var listBox = new ListBox
 			{
 				Location = new Point(50, label.Bottom + 20),
 				Size = new Size(500, 80),
-				Font = new Font("Times New Roman", 14, FontStyle.Regular)
+				Font = font
 			};
 			listBox.Items.AddRange(generatorsNamesParameters.Keys.ToArray());
 			listBox.SelectedIndexChanged += (sender, args) =>
